@@ -1,4 +1,6 @@
 #include "queue.h"
+#include <cairo.h>
+#include <cairo-pdf.h>
 
 queue s;
 
