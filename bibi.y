@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <cairo.h>
 #include <cairo-pdf.h>
+#include "draw.h"
   cairo_surface_t * pdf_surface ;
   cairo_t *cr ;
 %}
@@ -23,12 +24,12 @@ e : DRAW i
   |
   ;
 
-i : point suite {DrawPoints();}
+i : suite {DrawPoints();}
   ;
 
 
-suite : "--" point suite
-      |
+suite : suite "--" point
+      | point
       ;
 
 point : '(' expr ',' expr ')' {AddPoint( $2, $4 );}
@@ -68,3 +69,5 @@ p : '(' expr ',' expr ')'
 suite : -- p suite
       |
       ;
+*/
+

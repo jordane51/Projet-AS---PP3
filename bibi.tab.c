@@ -72,18 +72,13 @@
 #include <stdlib.h>
 #include <cairo.h>
 #include <cairo-pdf.h>
+#include "draw.h"
   cairo_surface_t * pdf_surface ;
   cairo_t *cr ;
-  struct point2d_t{
-    int x;
-    int y;
-  };
-  typedef struct point2d_t *Point2D;
-  Point2D listPoints[2];
-  
+
 
 /* Line 268 of yacc.c  */
-#line 87 "bibi.tab.c"
+#line 82 "bibi.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -119,7 +114,20 @@
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+typedef union YYSTYPE
+{
+
+/* Line 293 of yacc.c  */
+#line 10 "bibi.y"
+
+  double dbl;
+  int integer;
+ 
+
+
+/* Line 293 of yacc.c  */
+#line 130 "bibi.tab.c"
+} YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -130,7 +138,7 @@ typedef int YYSTYPE;
 
 
 /* Line 343 of yacc.c  */
-#line 134 "bibi.tab.c"
+#line 142 "bibi.tab.c"
 
 #ifdef short
 # undef short
@@ -347,22 +355,22 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  9
+#define YYFINAL  8
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   30
+#define YYLAST   19
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  11
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  5
+#define YYNNTS  6
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  14
+#define YYNRULES  13
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  28
+#define YYNSTATES  23
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   260
+#define YYMAXUTOK   261
 
 #define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -374,7 +382,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       7,     9,     2,    10,     8,     6,     2,     2,     2,     2,
+       7,     9,     2,    10,     8,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -396,7 +404,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
-       5
+       5,     6
 };
 
 #if YYDEBUG
@@ -404,25 +412,24 @@ static const yytype_uint8 yytranslate[] =
    YYRHS.  */
 static const yytype_uint8 yyprhs[] =
 {
-       0,     0,     3,     6,     9,    10,    15,    18,    19,    25,
-      31,    32,    36,    38,    42
+       0,     0,     3,     6,     9,    10,    13,    17,    18,    24,
+      25,    29,    31,    35
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
       12,     0,    -1,     4,    13,    -1,     5,    13,    -1,    -1,
-       6,     6,    14,    13,    -1,    14,    13,    -1,    -1,     7,
-       3,     8,     3,     9,    -1,     7,    15,     8,    15,     9,
-      -1,    -1,     7,    15,     9,    -1,     3,    -1,    15,    10,
-      15,    -1,    -1
+      15,    14,    -1,     6,    15,    14,    -1,    -1,     7,    16,
+       8,    16,     9,    -1,    -1,     7,    16,     9,    -1,     3,
+      -1,    16,    10,    16,    -1,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    20,    20,    21,    22,    25,    26,    27,    30,    31,
-      32,    35,    36,    37,    38
+       0,    22,    22,    23,    24,    27,    31,    32,    35,    36,
+      39,    40,    41,    42
 };
 #endif
 
@@ -431,8 +438,9 @@ static const yytype_uint8 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "NUMBER", "DRAW", "FILL", "'-'", "'('",
-  "','", "')'", "'+'", "$accept", "e", "i", "point", "expr", 0
+  "$end", "error", "$undefined", "NUMBER", "DRAW", "FILL", "\"--\"",
+  "'('", "','", "')'", "'+'", "$accept", "e", "i", "suite", "point",
+  "expr", 0
 };
 #endif
 
@@ -441,7 +449,7 @@ static const char *const yytname[] =
    token YYLEX-NUM.  */
 static const yytype_uint16 yytoknum[] =
 {
-       0,   256,   257,   258,   259,   260,    45,    40,    44,    41,
+       0,   256,   257,   258,   259,   260,   261,    40,    44,    41,
       43
 };
 # endif
@@ -449,15 +457,15 @@ static const yytype_uint16 yytoknum[] =
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    11,    12,    12,    12,    13,    13,    13,    14,    14,
-      14,    15,    15,    15,    15
+       0,    11,    12,    12,    12,    13,    14,    14,    15,    15,
+      16,    16,    16,    16
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     2,     2,     0,     4,     2,     0,     5,     5,
-       0,     3,     1,     3,     0
+       0,     2,     2,     2,     0,     2,     3,     0,     5,     0,
+       3,     1,     3,     0
 };
 
 /* YYDEFACT[STATE-NAME] -- Default reduction number in state STATE-NUM.
@@ -465,31 +473,31 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       4,     7,     7,     0,     0,    14,     2,     7,     3,     1,
-      10,    12,    14,     0,     6,     7,     0,    12,     0,    14,
-      14,     5,     0,    11,     0,    13,     8,     9
+       4,     9,     9,     0,    13,     2,     7,     3,     1,    11,
+      13,     0,     9,     5,     0,    13,    13,     7,    10,     0,
+      12,     6,     8
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     3,     6,     7,    13
+      -1,     3,     5,    13,     6,    11
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -12
+#define YYPACT_NINF -11
 static const yytype_int8 yypact[] =
 {
-      10,    11,    11,     4,     5,    -1,   -12,    11,   -12,   -12,
-       9,    17,     0,     2,   -12,    11,    16,   -12,    12,     0,
-       0,   -12,    18,   -12,    14,    19,   -12,   -12
+       4,     7,     7,    15,     0,   -11,    -5,   -11,   -11,   -11,
+       0,    -6,     7,   -11,     1,     0,     0,    -5,   -11,     3,
+       6,   -11,   -11
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -12,   -12,    -2,    20,   -11
+     -11,   -11,    16,     2,     5,   -10
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -498,33 +506,29 @@ static const yytype_int8 yypgoto[] =
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
-       8,    18,    11,    17,     9,    14,    12,    12,    24,    25,
-      19,    10,    20,    21,     1,     2,     5,     4,     5,    22,
-       0,    23,    20,    27,    20,    16,     0,    26,     0,    20,
-      15
+      14,    12,    15,     9,    16,    19,    20,    10,     1,     2,
+      18,    16,    22,    16,     4,     8,    16,    17,     7,    21
 };
 
 #define yypact_value_is_default(yystate) \
-  ((yystate) == (-12))
+  ((yystate) == (-11))
 
 #define yytable_value_is_error(yytable_value) \
   YYID (0)
 
-static const yytype_int8 yycheck[] =
+static const yytype_uint8 yycheck[] =
 {
-       2,    12,     3,     3,     0,     7,     7,     7,    19,    20,
-       8,     6,    10,    15,     4,     5,     7,     6,     7,     3,
-      -1,     9,    10,     9,    10,     8,    -1,     9,    -1,    10,
-      10
+      10,     6,     8,     3,    10,    15,    16,     7,     4,     5,
+       9,    10,     9,    10,     7,     0,    10,    12,     2,    17
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     4,     5,    12,     6,     7,    13,    14,    13,     0,
-       6,     3,     7,    15,    13,    14,     8,     3,    15,     8,
-      10,    13,     3,     9,    15,    15,     9,     9
+       0,     4,     5,    12,     7,    13,    15,    13,     0,     3,
+       7,    16,     6,    14,    16,     8,    10,    15,     9,    16,
+      16,    14,     9
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1358,17 +1362,38 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-        case 9:
+        case 5:
 
 /* Line 1806 of yacc.c  */
-#line 31 "bibi.y"
-    {listPoints[0][0] = (yyvsp[(2) - (5)]); listPoints[0][1] = (yyvsp[(4) - (5)]);}
+#line 27 "bibi.y"
+    {DrawPoints();}
+    break;
+
+  case 8:
+
+/* Line 1806 of yacc.c  */
+#line 35 "bibi.y"
+    {AddPoint( (yyvsp[(2) - (5)].dbl), (yyvsp[(4) - (5)].dbl) );}
+    break;
+
+  case 11:
+
+/* Line 1806 of yacc.c  */
+#line 40 "bibi.y"
+    {(yyval.dbl) = (yyvsp[(1) - (1)].dbl);}
+    break;
+
+  case 12:
+
+/* Line 1806 of yacc.c  */
+#line 41 "bibi.y"
+    { (yyval.dbl) = (yyvsp[(1) - (3)].dbl) + (yyvsp[(3) - (3)].dbl);}
     break;
 
 
 
 /* Line 1806 of yacc.c  */
-#line 1372 "bibi.tab.c"
+#line 1397 "bibi.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1599,20 +1624,34 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 41 "bibi.y"
+#line 45 "bibi.y"
 
 int yyerror(char *s){
   fprintf(stderr,"%s\n",s);
   exit(1);
 }
 int main(){
-  pdf_surface = cairo_pdf_surface_create ( "ex1.pdf" ,50 ,50 );
-  cr = cairo_create ( pdf_surface );
-  listPoints = (struct point2d_t*)malloc(sizeof(struct point2d_t) * 500);
-  if( yyparse() == 0 ) 
-    printf( "Syntaxe correcte\n" );
-  else
-    printf( "Syntaxe incorrecte\n" );
+     pdf_surface = cairo_pdf_surface_create ( "ex1.pdf" ,50 ,50 );
+     cr = cairo_create ( pdf_surface );
+
+     // Intialize the queue
+     Init();
+
+     if( yyparse() == 0 ) 
+	  printf( "Syntaxe correcte\n" );
+     else
+	  printf( "Syntaxe incorrecte\n" );
 }
+
+/*
+
+i : p suite
+
+p : '(' expr ',' expr ')'
+
+suite : -- p suite
+      |
+      ;
+*/
 
 

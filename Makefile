@@ -4,10 +4,11 @@ INCLUDE_CAIRO= -I/usr/include/cairo    -I/usr/include/glib-2.0  -I/usr/lib/glib-
 	       -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng15
 LIBS_CAIRO=-lcairo
 OUTFILE=Draw
+CFLAGS=-D_GNU_SOURCE
 $(OUTFILE): bibi.tab.o lex.yy.o
-	gcc $(INCLUDE_CAIRO) $(LIBS_CAIRO) $^ -o $(OUTFILE)
+	gcc  $(CFLAGS) $(INCLUDE_CAIRO) $(LIBS_CAIRO) draw.c queue_list_array.c $^ -o $(OUTFILE)
 bibi.tab.o: bibi.tab.c
-	gcc -c $(INCLUDE_CAIRO) $(LIBS_CAIRO) $< 
+	gcc -c $(INCLUDE_CAIRO) $(LIBS_CAIRO)  $< 
 lex.yy.o: lex.yy.c
 	gcc $< -c
 bibi.tab.c: 

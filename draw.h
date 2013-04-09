@@ -2,14 +2,15 @@
 #include <cairo.h>
 #include <cairo-pdf.h>
 
-queue s;
 
-struc point2d_t{
+
+struct point2d_t{
   double x;
   double y;
 };
 
-typedef Point struct point2d_t;
+typedef struct point2d_t* Point;
+queue s;
 
 void Init( void );
 void AddPoint( double x, double y );
