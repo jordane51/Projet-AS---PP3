@@ -1,0 +1,20 @@
+%{
+
+#include "bibi.tab.h"
+
+  //extern int number;
+%}
+%option noyywrap
+%%
+"-"           {return '-';}
+"draw"        {return DRAW;}
+"fill"        {return FILL;}
+"("           {return '(';}
+")"           {return ')';}
+[[:digit:]]+  {yylval = atoi(yytext); return NUMBER;}
+"."           {return '.';}
+","           {return ',';}
+\+            {return '+';}
+\*            {return '*';}
+\/            {return '/';}
+
