@@ -53,8 +53,6 @@ int main(){
      cr = cairo_create ( pdf_surface );
      FILE* f = fopen("test.c", "w");
      PrintMain(f);
-     
-     
 
      // Intialize the queue
      Init();
@@ -71,5 +69,10 @@ void PrintMain(FILE* f)
 	     "#include <cairo.h>\n" \
 	     "#include <cairo-pdf.h>" \
 	     "\nint main()\n{\n");
+
+     fprintf( f, "\tcairo_surface_t * pdf_surface ;" \
+	      "\tcairo_t *cr ;" \						\
+	      "\tpdf_surface = cairo_pdf_surface_create ( \"ex1.pdf\" ,50 ,50 );" \
+	      "\tcr = cairo_create ( pdf_surface );" );
 }
 
