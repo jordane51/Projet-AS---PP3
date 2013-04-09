@@ -5,9 +5,8 @@ void Init( void ){
 }
 
 void AddPoint( double x, double y ){
-   
+  
 }
-
 void DrawPoints( void ){
 
 }
