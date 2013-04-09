@@ -48,8 +48,13 @@ int yyerror(char *s){
   exit(1);
 }
 int main(){
+     
      pdf_surface = cairo_pdf_surface_create ( "ex1.pdf" ,50 ,50 );
      cr = cairo_create ( pdf_surface );
+     FILE* f = fopen("test.c", "w");
+     PrintMain(f);
+     
+     
 
      // Intialize the queue
      Init();
@@ -60,14 +65,11 @@ int main(){
 	  printf( "Syntaxe incorrecte\n" );
 }
 
-/*
-
-i : p suite
-
-p : '(' expr ',' expr ')'
-
-suite : -- p suite
-      |
-      ;
-*/
+void PrintMain(FILE* f)
+{
+     fprintf(f, "#include \"draw.h\"\n" \
+	     "#include <cairo.h>\n" \
+	     "#include <cairo-pdf.h>" \
+	     "\nint main()\n{\n");
+}
 
