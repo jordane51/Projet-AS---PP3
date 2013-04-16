@@ -7,15 +7,17 @@
   double dbl;
   int integer;
  }
-
+ 
+%token SEP
 %token <dbl>NUMBER
 %token DRAW
 %token FILL
-%type <dbl> expr
-%type <dbl> point
+%type <dbl>expr
+%type <dbl>point
+%left '+'
 %%
 
-e : DRAW i 
+e : DRAW i
   | FILL i
   |
   ;
@@ -23,17 +25,16 @@ e : DRAW i
 i : suite
   ;
 
-
-suite : suite "--" point
+suite : suite SEP point
       | point
       ;
 
-point : '(' expr ',' expr ')'
+point : '(' expr ',' expr ')' {$$ = $2;}
       ; 
 
-expr : '(' expr ')' 
+expr : '(' expr ')' {$$ = $2;}
      | NUMBER
-     | expr '+' expr 
+     | expr '+' expr
      ;
 
 %%

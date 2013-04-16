@@ -1,4 +1,4 @@
-void openFile();
+int openFile();
 
 void printInit();
 
