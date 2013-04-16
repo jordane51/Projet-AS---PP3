@@ -17,7 +17,7 @@
 %left '+'
 %%
 
-e : DRAW i
+e : DRAW i {printFile("cairo_move_to(cr, ");}
   | FILL i
   |
   ;
@@ -33,7 +33,7 @@ point : '(' expr ',' expr ')' {$$ = $2;}
       ; 
 
 expr : '(' expr ')' {$$ = $2;}
-     | NUMBER
+     | NUMBER {printDouble($1);}
      | expr '+' expr
      ;
 
@@ -42,9 +42,12 @@ int yyerror(char *s){
   exit(1);
 }
 int main(){
+    openFile();
     printInit();
      if( yyparse() == 0 ) 
 	  printf( "Syntaxe correcte\n" );
      else
 	  printf( "Syntaxe incorrecte\n" );
+    printFile("\n}");
+    closeFile();
 }
