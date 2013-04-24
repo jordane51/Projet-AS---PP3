@@ -5,25 +5,49 @@
 FILE *pfile = NULL;
 
 int openFile(){
- pfile = fopen("draw.gen.c","w+");
- if(pfile == NULL){
-   exit(EXIT_FAILURE);
- }
+     pfile = fopen("draw.gen.c","w");
+     if(pfile == NULL){
+	  return 0;
+     }
+     return 1;
 }
 
 void printInit(){
-  printFile("#include <cairo.h>\n#include <cairo-pdf.h>\nint main( void ){\ncairo_surface_t *surface;\ncairo_t *cr;\ncairo_surface_t *pdf_surface = cairo_pdf_surface_create(\"res.pdf\",50,50);\ncr = cairo_create( pdf_surface );\n");
+     fprintf(pfile, "#include <cairo.h>\n" \
+	     "#include <cairo-pdf.h>\n" \
+	     "\tint main( void ){\n" \
+	     "\tcairo_surface_t *surface;\n" \
+	     "\tcairo_t *cr;\n" \					
+	     "\tcairo_surface_t *pdf_surface = cairo_pdf_surface_create(\"res.pdf\",50,50);\n" \
+	     "\tcr = cairo_create( pdf_surface );\n");
+
+     /*printFile("#include <cairo.h>\n" \ 
+       "#include <cairo-pdf.h>\n" \ 
+       "\tint main( void ){\n" \
+       "\tcairo_surface_t *surface;\ncairo_t *cr;\n" \
+       "\tcairo_surface_t *pdf_surface = cairo_pdf_surface_create(\"res.pdf\",50,50);\n" \
+       "\tcr = cairo_create( pdf_surface );\n");*/
 }
 
 void printFile(char *text){
-  printf("Printing...\n");
-  fprintf(pfile,text);
+     printf("Printing...\n");
+     fprintf(pfile,text);
+}
+
+void printMove( double n1, double n2 )
+{
+     fprintf( pfile, "\tcairo_move_to( cr, %0.2f, %0.2f );\n", n1, n2 ); 
+}
+
+void printLine( double n1, double n2 )
+{
+     fprintf( pfile, "\tcairo_line_to( cr, %f, %f );\n", n1, n2 );
 }
 
 void printDouble(double d){
- fprintf(pfile,"%f",d); 
+     fprintf(pfile,"%f",d); 
 }
 
 void closeFile(){
-  fclose(pfile);
+     fclose(pfile);
 }

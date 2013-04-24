@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "generator.h"
+
+int wasMoved = 0;
 %}
 %union{
   double dbl;
@@ -17,7 +19,7 @@
 %left '+'
 %%
 
-e : DRAW i {printFile("cairo_move_to(cr, ");}
+e : DRAW i 
   | FILL i
   |
   ;
@@ -29,11 +31,12 @@ suite : suite SEP point
       | point
       ;
 
-point : '(' expr ',' expr ')' {$$ = $2;}
+point : '(' expr ',' expr ')' { if( !wasMoved ){ printMove( $2, $4 );  wasMoved = 1;} 
+                                else{ printLine( $2, $4 );} $$ = $2;}
       ; 
 
-expr : '(' expr ')' {$$ = $2;}
-     | NUMBER {printDouble($1);}
+expr : '(' expr ')' { $$ = $2;}
+     | NUMBER {$$ = $1;}
      | expr '+' expr
      ;
 
@@ -42,12 +45,15 @@ int yyerror(char *s){
   exit(1);
 }
 int main(){
-    openFile();
-    printInit();
-     if( yyparse() == 0 ) 
-	  printf( "Syntaxe correcte\n" );
-     else
-	  printf( "Syntaxe incorrecte\n" );
-    printFile("\n}");
-    closeFile();
+     int success = openFile();
+     if( success ){
+	  printInit();
+	  if( yyparse() == 0 ) 
+	       printf( "Syntaxe correcte\n" );
+	  else
+	       printf( "Syntaxe incorrecte\n" );
+	  printFile("\n}");
+	  closeFile();
+     }
+     fprintf( stderr, "Error : cannot open/generate draw.gen.c\n" );
 }
