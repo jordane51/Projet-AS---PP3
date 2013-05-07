@@ -6,7 +6,7 @@
 %}
 %option noyywrap
 %%
-"-"           {return '-';}
+"--"          {return SEP;}
 "draw"        {return DRAW;}
 "fill"        {return FILL;}
 "("           {return '(';}

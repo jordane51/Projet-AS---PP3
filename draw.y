@@ -37,7 +37,7 @@ point : '(' expr ',' expr ')' { if( !wasMoved ){ printMove( $2, $4 );  wasMoved 
 
 expr : '(' expr ')' { $$ = $2;}
      | NUMBER {$$ = $1;}
-     | expr '+' expr
+     | expr '+' expr {$$ = $1 + $3;}
      ;
 
 %%
@@ -55,5 +55,4 @@ int main(){
 	  printFile("\n}");
 	  closeFile();
      }
-     fprintf( stderr, "Error : cannot open/generate draw.gen.c\n" );
 }
