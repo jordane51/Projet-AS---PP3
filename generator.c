@@ -3,6 +3,11 @@
 #include "generator.h"
 #include <math.h>
 
+struct point_t{
+     double x;
+     double y;
+};
+
 int wasMoved = 0;
 
 FILE *pfile = NULL;

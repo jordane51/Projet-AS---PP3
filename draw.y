@@ -11,6 +11,7 @@
  }
  
 %token SEP
+%token SEP_PLUS
 %token <dbl>NUMBER
 %token DRAW
 %token FILL
@@ -28,6 +29,7 @@ i : suite
   ;
 
 suite : suite SEP point
+      : suite SEP_PLUS point
       | point
       ;
 
