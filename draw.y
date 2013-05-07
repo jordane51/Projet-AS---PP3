@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "generator.h"
 
-int wasMoved = 0;
+
 %}
 %union{
   double dbl;
@@ -31,13 +31,18 @@ suite : suite SEP point
       | point
       ;
 
-point : '(' expr ',' expr ')' { if( !wasMoved ){ printMove( $2, $4 );  wasMoved = 1;} 
-                                else{ printLine( $2, $4 );} $$ = $2;}
+/*point : '(' expr ',' expr ')' { if( !wasMoved ){ printMove( $2, $4 );  wasMoved = 1;} 
+                                else{ printLine( $2, $4 );} $$ = $2;}*/
+point : '(' expr ',' expr ')' { printCPoint( $2, $4 ); }
+      | '(' expr ':' expr ')' { printPPoint( $2, $4 ); }
       ; 
 
 expr : '(' expr ')' { $$ = $2;}
      | NUMBER {$$ = $1;}
      | expr '+' expr {$$ = $1 + $3;}
+     | expr '/' expr {$$ = $1 / $3;}
+     | expr '*' expr {$$ = $1 * $3;}
+     | expr '-' expr {$$ = $1 - $3;}
      ;
 
 %%

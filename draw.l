@@ -14,7 +14,10 @@
 [[:digit:]]+  {yylval.dbl = atof(yytext); return NUMBER;}
 "."           {return '.';}
 ","           {return ',';}
-\+            {return '+';}
-\*            {return '*';}
-\/            {return '/';}
+":"           {return ':';}
+"+"           {return '+';}
+"*"           {return '*';}
+"/"           {return '/';}
+"-"           {return '-';}
+
 

@@ -3,7 +3,7 @@ LEX_FILE=draw.l
 INCLUDE_CAIRO= -I/usr/include/cairo    -I/usr/include/glib-2.0  -I/usr/lib/glib-2.0/include \
 	       -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng15
 INCLUDE_GENERATOR= generator.c generator.h
-LIBS_CAIRO=-lcairo
+LIBS_CAIRO=-lcairo -lm
 OUTFILE=Draw
 CFLAGS=-D_GNU_SOURCE
 $(OUTFILE): draw.tab.o lex.yy.o
