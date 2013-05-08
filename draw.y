@@ -18,6 +18,9 @@
 %type <dbl>expr
 %type <dbl>point
 %left '+'
+%left '*'
+%left '/'
+%left '-'
 %%
 
 e : DRAW i 
