@@ -23,9 +23,12 @@
 %left '-'
 %%
 
-e : DRAW i 
-  | FILL i
+s : s e
   |
+  ;
+
+e : DRAW i {setDrawMode(DRAW_MODE_STROKE); printDraw();}
+| FILL i {setDrawMode(DRAW_MODE_FILL); printDraw();}
   ;
 
 i : suite

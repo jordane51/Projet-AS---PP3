@@ -3,12 +3,15 @@
 #include "generator.h"
 #include <math.h>
 
+#define LINE_WIDTH 1.0
 struct point_t{
      double x;
      double y;
 };
 
 int wasMoved = 0;
+int currentMode = DRAW_MODE_NONE;
+
 
 FILE *pfile = NULL;
 
@@ -18,6 +21,10 @@ int openFile(){
 	  return 0;
      }
      return 1;
+}
+
+void setDrawMode( int mode ){
+    currentMode = mode;
 }
 
 void printInit(){
@@ -38,7 +45,7 @@ void printInit(){
 }
 
 void printEnd(){
-    fprintf(pfile, "\tcairo_set_line_width( cr , 0.5 );\n\tcairo_stroke( cr );\n\tcairo_destroy( cr );\n\tcairo_surface_destroy( pdf_surface );\n\treturn 0;\n}");
+    fprintf(pfile, "\tcairo_destroy( cr );\n\tcairo_surface_destroy( pdf_surface );\n\treturn 0;\n}");
 }
 
 void printFile(char *text){
@@ -86,6 +93,18 @@ void printPPoint( double angle, double rayon )
 
 void printDouble(double d){
      fprintf(pfile,"%f",d); 
+}
+
+void printDraw( void ){
+    if(currentMode == 0){
+        // DO NOTHING
+    } else if(currentMode == DRAW_MODE_STROKE){ // STROKE
+        fprintf( pfile,"\tcairo_set_line_width( cr , %f );\n\tcairo_stroke( cr );\n",LINE_WIDTH );
+    } else if(currentMode == DRAW_MODE_FILL){ // FILL
+        fprintf( pfile,"\tcairo_set_source_rgb( cr, 0, 0, 0 );//black\n\tcairo_fill( cr );\n" );
+    }
+    // Reset was_moved for next command !
+    wasMoved = 0;
 }
 
 void closeFile(){
