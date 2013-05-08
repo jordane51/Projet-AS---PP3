@@ -59,7 +59,7 @@ int main(){
 	       printf( "Syntaxe correcte\n" );
 	  else
 	       printf( "Syntaxe incorrecte\n" );
-	  printFile("\n}");
+         printEnd();
 	  closeFile();
      }
 }

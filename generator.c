@@ -37,6 +37,10 @@ void printInit(){
        "\tcr = cairo_create( pdf_surface );\n");*/
 }
 
+void printEnd(){
+    fprintf(pfile, "\tcairo_set_line_width( cr , 0.5 );\n\tcairo_stroke( cr );\n\tcairo_destroy( cr );\n\tcairo_surface_destroy( pdf_surface );\n\treturn 0;\n}");
+}
+
 void printFile(char *text){
      printf("Printing...\n");
      fprintf(pfile,text);
