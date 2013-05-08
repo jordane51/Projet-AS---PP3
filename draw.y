@@ -29,7 +29,7 @@ i : suite
   ;
 
 suite : suite SEP point
-      : suite SEP_PLUS point
+      | suite SEP_PLUS point
       | point
       ;
 
