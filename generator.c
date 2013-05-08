@@ -10,8 +10,8 @@ struct point_t{
 };
 
 int wasMoved = 0;
-int currentMode = DRAW_MODE_NONE;
-
+int currentDrawMode = DRAW_MODE_NONE;
+int currentPointMode = POINT_MODE_NONE;
 
 FILE *pfile = NULL;
 
@@ -23,8 +23,12 @@ int openFile(){
      return 1;
 }
 
+void setPointMode( int mode ){
+    currentPointMode = mode;
+}
+
 void setDrawMode( int mode ){
-    currentMode = mode;
+    currentDrawMode = mode;
 }
 
 void printInit(){
@@ -66,11 +70,19 @@ void printLine( double n1, double n2 )
 void printCPoint( double x, double y )
 {
      if( !wasMoved ){
-	  fprintf( pfile, "\tcairo_move_to( cr, %0.2f, %0.2f );\n", x, y ); 
+         if(currentPointMode == POINT_MODE_NONE)
+             fprintf( pfile, "\tcairo_move_to( cr, %0.2f, %0.2f );\n", x, y );
+         else if(currentPointMode == POINT_MODE_ADD)
+             fprintf( pfile, "\tcairo_rel_move_to( cr, %0.2f, %0.2f );\n", x, y );
 	  wasMoved++;
      } else {
-	  fprintf( pfile, "\tcairo_line_to( cr, %0.2f, %0.2f );\n", x, y );
+         if(currentPointMode == POINT_MODE_NONE)
+             fprintf( pfile, "\tcairo_line_to( cr, %0.2f, %0.2f );\n", x, y );
+         else if(currentPointMode == POINT_MODE_ADD)
+            fprintf( pfile, "\tcairo_rel_line_to( cr, %0.2f, %0.2f );\n", x, y );
      }
+    //reset currentPointMode for next point ! -TODO add a function to do this
+    currentPointMode = POINT_MODE_NONE;
 }
 
 void printPPoint( double angle, double rayon )
@@ -83,10 +95,16 @@ void printPPoint( double angle, double rayon )
      double x = rayon * cos( angle );
      double y = rayon * sin( angle );
      if( !wasMoved ){
-	  fprintf( pfile, "\tcairo_move_to( cr, %0.2f, %0.2f );\n", x, y ); 
+         if(currentPointMode == POINT_MODE_NONE)
+             fprintf( pfile, "\tcairo_move_to( cr, %0.2f, %0.2f );\n", x, y );
+         else if(currentPointMode == POINT_MODE_ADD)
+             fprintf( pfile, "\tcairo_rel_move_to( cr, %0.2f, %0.2f );\n", x, y );
 	  wasMoved++;
      } else {
-	  fprintf( pfile, "\tcairo_line_to( cr, %0.2f, %0.2f );\n", x, y );
+         if(currentPointMode == POINT_MODE_NONE)
+             fprintf( pfile, "\tcairo_line_to( cr, %0.2f, %0.2f );\n", x, y );
+         else if(currentPointMode == POINT_MODE_ADD)
+             fprintf( pfile, "\tcairo_rel_line_to( cr, %0.2f, %0.2f );\n", x, y );
      }
 
 }
@@ -96,11 +114,11 @@ void printDouble(double d){
 }
 
 void printDraw( void ){
-    if(currentMode == 0){
+    if(currentDrawMode == 0){
         // DO NOTHING
-    } else if(currentMode == DRAW_MODE_STROKE){ // STROKE
+    } else if(currentDrawMode == DRAW_MODE_STROKE){ // STROKE
         fprintf( pfile,"\tcairo_set_line_width( cr , %f );\n\tcairo_stroke( cr );\n",LINE_WIDTH );
-    } else if(currentMode == DRAW_MODE_FILL){ // FILL
+    } else if(currentDrawMode == DRAW_MODE_FILL){ // FILL
         fprintf( pfile,"\tcairo_set_source_rgb( cr, 0, 0, 0 );//black\n\tcairo_fill( cr );\n" );
     }
     // Reset was_moved for next command !

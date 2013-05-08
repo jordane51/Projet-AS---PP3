@@ -2,9 +2,11 @@
 #define _GENERATOR_H_
 
 enum{
-    DRAW_MODE_NONE = 0,
-    DRAW_MODE_STROKE = 1,
-    DRAW_MODE_FILL = 2
+    DRAW_MODE_NONE, //"Default" value
+    DRAW_MODE_STROKE,
+    DRAW_MODE_FILL,
+    POINT_MODE_NONE,//"Default" value
+    POINT_MODE_ADD
 };
 
 // Used to open the generated text file (draw.gen.c)
@@ -12,6 +14,9 @@ int openFile();
 
 // Sets the current drawing mode to whatever is specified
 void setDrawMode( int );
+
+// Sets the current point type
+void setPointMode( int );
 
 // Prints the necessary code to initialize the surface
 void printInit();

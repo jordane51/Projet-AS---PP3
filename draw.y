@@ -27,15 +27,12 @@ s : s e
   |
   ;
 
-e : DRAW i {setDrawMode(DRAW_MODE_STROKE); printDraw();}
-| FILL i {setDrawMode(DRAW_MODE_FILL); printDraw();}
-  ;
-
-i : suite
+e : DRAW suite {setDrawMode(DRAW_MODE_STROKE); printDraw();}
+| FILL suite {setDrawMode(DRAW_MODE_FILL); printDraw();}
   ;
 
 suite : suite SEP point
-      | suite SEP_PLUS point
+| suite SEP '+' {setPointMode(POINT_MODE_ADD);} point
       | point
       ;
 
