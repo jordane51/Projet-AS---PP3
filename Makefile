@@ -1,7 +1,14 @@
+UNAME = $(shell uname)
 BISON_FILE=draw.y
 LEX_FILE=draw.l
-INCLUDE_CAIRO= -I/usr/include/cairo    -I/usr/include/glib-2.0  -I/usr/lib/glib-2.0/include \
+ifeq ($(UNAME), Linux)
+	INCLUDE_CAIRO= -I/usr/include/cairo    -I/usr/include/glib-2.0  -I/usr/lib/glib-2.0/include \
 	       -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng15
+endif
+ifeq ($(UNAME), Darwin)
+	INCLUDE_CAIRO= -L/usr/X11/lib -L/opt/X11/include/cairo/
+endif
+
 INCLUDE_GENERATOR= generator.c generator.h
 LIBS_CAIRO=-lcairo -lm
 OUTFILE=Draw
@@ -24,4 +31,10 @@ bison:
 
 .PHONY: clean
 clean:
-	rm -f *.o draw.tab.c draw.tab.h lex.yy.c $(OUTFILE) *.pdf *~ *output
+	rm -f *.o draw.tab.c draw.tab.h lex.yy.c $(OUTFILE) *.pdf *~ *output *out
+exe:
+ifeq ($(UNAME), Darwin)
+	gcc draw.gen.c `pkg-config --cflags --libs cairo` -o ex1.out
+else
+	gcc draw.gen.c `pkg-config --cflags --libs cairo` -o ex1.out
+endif
