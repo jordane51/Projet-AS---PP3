@@ -19,5 +19,6 @@
 "*"           {return '*';}
 "/"           {return '/';}
 "-"           {return '-';}
+"cycle"       {return CYCLE;}
 
 

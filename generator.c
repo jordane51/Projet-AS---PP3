@@ -4,14 +4,11 @@
 #include <math.h>
 
 #define LINE_WIDTH 1.0
-struct point_t{
-     double x;
-     double y;
-};
 
 int wasMoved = 0;
 int currentDrawMode = DRAW_MODE_NONE;
 int currentPointMode = POINT_MODE_NONE;
+point firstPoint =  NULL;
 
 FILE *pfile = NULL;
 
@@ -21,6 +18,14 @@ int openFile(){
 	  return 0;
      }
      return 1;
+}
+
+void setFirstPoint( double x, double y){
+    if(!firstPoint){
+        firstPoint = malloc(sizeof(struct point));
+    }
+    firstPoint->x = x;
+    firstPoint->y = y;
 }
 
 void setPointMode( int mode ){
@@ -70,6 +75,7 @@ void printLine( double n1, double n2 )
 void printCPoint( double x, double y )
 {
      if( !wasMoved ){
+         setFirstPoint(x,y);
          if(currentPointMode == POINT_MODE_NONE)
              fprintf( pfile, "\tcairo_move_to( cr, %0.2f, %0.2f );\n", x, y );
          else if(currentPointMode == POINT_MODE_ADD)
@@ -95,6 +101,7 @@ void printPPoint( double angle, double rayon )
      double x = rayon * cos( angle );
      double y = rayon * sin( angle );
      if( !wasMoved ){
+         setFirstPoint(x,y);
          if(currentPointMode == POINT_MODE_NONE)
              fprintf( pfile, "\tcairo_move_to( cr, %0.2f, %0.2f );\n", x, y );
          else if(currentPointMode == POINT_MODE_ADD)
@@ -107,6 +114,13 @@ void printPPoint( double angle, double rayon )
              fprintf( pfile, "\tcairo_rel_line_to( cr, %0.2f, %0.2f );\n", x, y );
      }
 
+}
+
+void printCycle(){
+    if(currentPointMode == POINT_MODE_NONE)
+        fprintf( pfile, "\tcairo_line_to( cr, %0.2f, %0.2f );\n", firstPoint->x, firstPoint->y );
+    else if(currentPointMode == POINT_MODE_ADD)
+        fprintf( pfile, "\tcairo_rel_line_to( cr, %0.2f, %0.2f );\n", firstPoint->x, firstPoint->y );
 }
 
 void printDouble(double d){
@@ -122,6 +136,8 @@ void printDraw( void ){
         fprintf( pfile,"\tcairo_set_source_rgb( cr, 0, 0, 0 );//black\n\tcairo_fill( cr );\n" );
     }
     // Reset was_moved for next command !
+    free(firstPoint);
+    firstPoint = NULL;
     wasMoved = 0;
 }
 

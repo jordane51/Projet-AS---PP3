@@ -12,6 +12,7 @@
  
 %token SEP
 %token SEP_PLUS
+%token CYCLE
 %token <dbl>NUMBER
 %token DRAW
 %token FILL
@@ -34,6 +35,7 @@ e : DRAW suite {setDrawMode(DRAW_MODE_STROKE); printDraw();}
 suite : suite SEP point
 | suite SEP '+' {setPointMode(POINT_MODE_ADD);} point
       | point
+| suite SEP CYCLE {printCycle();}
       ;
 
 /*point : '(' expr ',' expr ')' { if( !wasMoved ){ printMove( $2, $4 );  wasMoved = 1;} 

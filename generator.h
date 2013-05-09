@@ -9,6 +9,13 @@ enum{
     POINT_MODE_ADD
 };
 
+struct point{
+    double x;
+    double y;
+};
+
+typedef struct point *point;
+
 // Used to open the generated text file (draw.gen.c)
 int openFile();
 
