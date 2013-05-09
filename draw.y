@@ -11,7 +11,7 @@
   int integer;
   int scalar;
   char str[256];
-  double* path;
+  char points[2][256];
 }
  
 %token SEP
@@ -26,9 +26,8 @@
 %token ID
 %token <str>NAME
 %type <dbl>expr
-%type <dbl>point
+%type <points>point
 %type <dbl>scalar
-%type <path>chemin
 %left '+'
 %left '*'
 %left '/'
@@ -47,7 +46,8 @@ e : DRAW suite {setDrawMode(DRAW_MODE_STROKE); printDraw();}
   | var
   | IMAGE NAME { pushImage($2); } '=' IMAGE '{' e '}' { }
   | FUNCTION NAME{} '{' e '}' {}
-  ;
+
+
 
 scalar : NAME { $$ = get_scalarValue( $1 ); }
        | NUMBER { $$ = $1; }
@@ -56,22 +56,23 @@ scalar : NAME { $$ = get_scalarValue( $1 ); }
 
 var : ID NAME '=' NUMBER {register_scalarVar( $2, $4 );}
     | ID NAME '=' '(' expr ',' expr ')' {register_CPointVar( $2, $5, $7 );}
-| ID NAME '=' chemin {register_path( $2, $4 );}
+    | ID NAME '=' path {register_path( $2 );}
     ;
 
-chemin : chemin SEP point
-| point {register_pointInPath( $1 );}
+path : path SEP point {register_pointInPath( $3 );}
+   | point {register_pointInPath( $1 );}
        ;
 
-suite : suite SEP point
-	  | suite SEP '+' {setPointMode(POINT_MODE_ADD);} point
+suite : suite SEP point {printf("test\n");}
+      | suite SEP '+' {setPointMode(POINT_MODE_ADD);} point
+      | NAME { printChemin( $1 ); }
+      | suite SEP CYCLE {printCycle();}
       | point
-	  | suite SEP CYCLE {printCycle();}
       ;
 
 
-point : scalar'(' expr ',' expr ')' { printCPoint( $3 * $1, $5 * $1); }
-      | scalar'(' expr ':' expr ')' { printPPoint( $3 * $1, $5 * $1 ); }
+point : scalar'(' expr ',' expr ')' { printCPoint( $3 * $1, $5 * $1); sprintf( $$[0], "%g", $3); sprintf( $$[1], "%g", $5);}
+      | scalar'(' expr ':' expr ')' { printPPoint( $3 * $1, $5 * $1 ); sprintf( $$[0], "%g", $3); sprintf( $$[1], "%g", $5);}
       | NAME {if(!strcmp( get_pointType( $1 ), "Cpoint" )){printCPoint( get_pointXValue( $1 ), get_pointYValue( $1 ));} else {printPPoint( get_pointXValue( $1 ), get_pointYValue( $1 ));}}
       ; 
 

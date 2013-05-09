@@ -306,3 +306,28 @@ double get_pointYValue( char* name )
 {
   return get_pointValueY( l, name );
 }
+
+void register_path( char* name )
+{
+  add_path( l, name );
+}
+
+void register_pointInPath( char** point )
+{
+  add_pointInPath( l, point );
+}
+
+void printChemin( char* name )
+{
+  List path = get_path( l, name );
+  Elem e = get_firstElem( path );
+  //Elem e = path->first;
+  while( e != NULL ){
+    double* point = (double*)get_value( e );
+    double x = point[0];
+    double y = point[1];
+    printCPoint( x, y );
+    delete_first( path );
+    e = get_firstElem( path );
+  }
+}

@@ -6,7 +6,7 @@ LIBS_CAIRO=-lm
 OUTFILE=Draw
 CFLAGS=-D_GNU_SOURCE
 $(OUTFILE): draw.tab.o lex.yy.o
-	gcc  $(CFLAGS) $(INCLUDE_CAIRO) $(INCLUDE_GENERATOR) list.c $(LIBS_CAIRO) $^ -o $(OUTFILE)
+	gcc  $(CFLAGS) $(INCLUDE_CAIRO) $(INCLUDE_GENERATOR) list.c stack_list.c $(LIBS_CAIRO) $^ -o $(OUTFILE)
 draw.tab.o: draw.tab.c
 	gcc -c $(INCLUDE_CAIRO) $(LIBS_CAIRO)  $< 
 lex.yy.o: lex.yy.c

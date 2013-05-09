@@ -12,6 +12,7 @@
 "cycle"       {return CYCLE;}
 "scalar"      {return ID;}
 "point"       {return ID;}
+"path"      {return ID;}
 "("           {return '(';}
 ")"           {return ')';}
 [[:digit:]]+  {yylval.dbl = atof(yytext); return NUMBER;}
@@ -22,7 +23,7 @@
 "*"           {return '*';}
 "/"           {return '/';}
 "-"           {return '-';}
-"=" 		  {return '=';}
+"=" 	      {return '=';}
 "image"       {return IMAGE;}
 "function"    {return FUNCTION;}
 "{"           {return '{';}

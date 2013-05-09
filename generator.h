@@ -59,12 +59,12 @@ void printEnd();
 
 void printFile(char *);
 
+void printChemin( char* name );
 void printDouble(double);
 void printPPoint( double, double );
 void printCPoint( double, double );
 void printMove( double, double );
 void printLine( double, double );
-void printEnd();
 void printDraw( void );
 
 //Images
@@ -82,9 +82,12 @@ void swapBuffers( void );
 void closeFile();
 
 void register_scalarVar( char* name, double value );
+void register_path( char* name );
+void register_pointInPath( char** point );
 double get_scalarValue( char* name );
 double get_pointXValue( char* name );
 double get_pointYValue( char* name );
 char* get_pointType( char* name );
+
 
 #endif

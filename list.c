@@ -43,12 +43,14 @@ void add_Cpoint( List l, char* name, double* values )
 double get_scalar( List l, char* name )
 {
   Elem e = l->first;
-  if( !strcmp( e->name, name ) ){
-    return *( double* )( e->value );
-  }
-  while( e->next != NULL ){
+  if( e ){
     if( !strcmp( e->name, name ) ){
-      return *( ( double* )e->value );
+      return *( double* )( e->value );
+    }
+    while( e->next != NULL ){
+      if( !strcmp( e->name, name ) ){
+	return *( ( double* )e->value );
+      }
     }
   }
   return 1.0;
@@ -66,7 +68,6 @@ char* get_type( List l, char* name )
   return "NULL";
 }
 
-// TODO : Cette fonction puis la meme pour point y !!!!!
 double get_pointValueX( List l, char* name )
 {
   Elem e = l->first;
@@ -111,4 +112,67 @@ void destroy( List l )
   }
   
   free( l );
+}
+
+void add_pointInPath( List l, char** point )
+{
+  Elem e = l->first;
+  if( e ){
+    Elem pt = ( Elem )malloc( sizeof( struct elem_t ) );
+    sprintf( pt->type, "Cpoint" );
+    double* xy = malloc( sizeof( double ) * 2 );
+    xy[0] = atof( point[0] );
+    xy[1] = atof( point[1] );
+    pt->value = xy;
+
+    List ll = ( List )e->value;
+    pt->next = ll->first;
+    ll->first = pt;
+  }
+  
+}
+
+void add_path( List l, char* name )
+{
+  printf(" add_path\n");
+  List ll = ( List )malloc( sizeof( struct list_t ) );
+  ll->first = NULL;
+  Elem path = ( Elem )malloc( sizeof( struct elem_t ) );
+  sprintf( path->type, "path" );
+  sprintf( path->name, "%s", name );
+  path->value = ll;
+  path->next = l->first;
+  l->first = path;
+}
+
+List get_path( List l, char* name )
+{
+  Elem e = l->first;
+  if( e ){
+    while( e != NULL ){
+      if( !strcmp( e->name, name ) ){
+	return ( List )e->value;
+      } else {
+	e = e->next;
+      }
+    }
+  }
+  return NULL;
+}
+
+void delete_first( List l )
+{
+  Elem tmp = l->first;
+  l->first = l->first->next;
+  free( tmp );
+}
+
+Elem get_firstElem( List l )
+{
+  return l->first;
+}
+
+void* get_value( Elem e )
+{
+  return e->value;
 }
