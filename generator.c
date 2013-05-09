@@ -60,10 +60,7 @@ void printInit(){
 }
 
 void printEnd(){
-    fprintf(pfile, "\tcairo_destroy( cr );\n" \
-				   "\tcairo_surface_destroy( pdf_surface );\n" \
-				   "\treturn 0;\n}");
-	destroy( l );
+    fprintf(pfile, "\tcairo_destroy( cr );\n\tcairo_surface_destroy( pdf_surface );\n\treturn 0;\n}");
 }
 
 void printFile(char *text){
@@ -136,6 +133,16 @@ void printDouble(double d){
      fprintf(pfile,"%f",d); 
 }
 
+void printEnd()
+{
+  fprintf( pfile, "\tcairo_set_line_width( cr, 5.0);\n"	\
+	   "\tcairo_stroke(cr);\n" \
+	   "\tcairo_destroy(cr);\n" \
+	   "\tcairo_surface_destroy(pdf_surface);\n" \
+	   "\treturn 0;\n" \
+	   "}");
+  destroy( l );
+}
 void printDraw( void ){
     if(currentDrawMode == 0){
         // DO NOTHING
