@@ -60,8 +60,8 @@ var : ID NAME '=' NUMBER {register_scalarVar( $2, $4 );}
     ;
 
 path : path SEP point {register_pointInPath( $3 );}
-   | point {register_pointInPath( $1 );}
-       ;
+     | point {register_pointInPath( $1 );}
+     ;
 
 suite : suite SEP point {printf("test\n");}
       | suite SEP '+' {setPointMode(POINT_MODE_ADD);} point
