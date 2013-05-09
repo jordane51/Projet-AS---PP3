@@ -11,6 +11,7 @@
 "fill"        {return FILL;}
 "cycle"       {return CYCLE;}
 "scalar"      {return ID;}
+"point"       {return ID;}
 "("           {return '(';}
 ")"           {return ')';}
 [[:digit:]]+  {yylval.dbl = atof(yytext); return NUMBER;}

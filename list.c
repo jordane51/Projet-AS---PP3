@@ -30,6 +30,16 @@ void add_scalar(List l, char* name, double* value )
   l->first = e;
 }
 
+void add_Cpoint( List l, char* name, double* values )
+{
+  Elem e = ( Elem )malloc( sizeof( struct elem_t ) );
+  sprintf( e->type, "Cpoint" );
+  sprintf( e->name, "%s" , name );
+  e->value = values;
+  e->next = l->first;
+  l->first = e;
+}
+
 double get_scalar( List l, char* name )
 {
   Elem e = l->first;
@@ -42,6 +52,45 @@ double get_scalar( List l, char* name )
     }
   }
   return 1.0;
+}
+
+char* get_type( List l, char* name )
+{
+  Elem e = l->first;
+  while( e != NULL ){
+    if( !strcmp( name, e->name ) ){
+      return e->type;
+    }
+    e = e->next;
+  }
+  return "NULL";
+}
+
+// TODO : Cette fonction puis la meme pour point y !!!!!
+double get_pointValueX( List l, char* name )
+{
+  Elem e = l->first;
+  while( e != NULL ){
+    if( !strcmp( e->name, name ) ){
+      double* d = e->value;
+      return d[0];
+    }
+    e = e->next;
+  }
+  return -1.0;
+}
+
+double get_pointValueY( List l, char* name )
+{
+  Elem e = l->first;
+  while( e != NULL ){
+    if( !strcmp( e->name, name ) ){
+      double* d = e->value;
+      return d[1];
+    }
+    e = e->next;
+  }
+  return -1.0;
 }
 
 void destroy_rec( Elem e )

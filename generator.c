@@ -162,7 +162,30 @@ void register_scalarVar( char* name, double value )
   add_scalar( l, name, v);
 }
 
+void register_CPointVar( char* name, double v1, double v2 )
+{
+  double* v = malloc( sizeof( double ) * 2 );
+  v[0] = v1;
+  v[1] = v2;
+  add_Cpoint( l, name, v );
+}
+
 double get_scalarValue( char* name )
 {
   return get_scalar( l, name );
+}
+
+char* get_pointType( char* name )
+{
+  return get_type( l, name );
+}
+
+double get_pointXValue( char* name )
+{
+  return get_pointValueX( l, name );
+}
+
+double get_pointYValue( char* name )
+{
+  return get_pointValueY( l, name );
 }

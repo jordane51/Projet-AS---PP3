@@ -45,5 +45,8 @@ void closeFile();
 
 void register_scalarVar( char* name, double value );
 double get_scalarValue( char* name );
+double get_pointXValue( char* name );
+double get_pointYValue( char* name );
+char* get_pointType( char* name );
 
 #endif
