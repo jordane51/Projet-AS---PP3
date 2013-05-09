@@ -36,17 +36,17 @@
 %%
   
 s : s e
-  | s IMAGE NAME { pushImage($3); } '=' IMAGE '{' e '}' { }
-  | s FUNCTION NAME{} '{' e '}' {}
   |
   ;
 
 e : DRAW suite {setDrawMode(DRAW_MODE_STROKE); printDraw();}
   | DRAW IMAGE '{' e '}' {}
   | FILL suite {setDrawMode(DRAW_MODE_FILL); printDraw();}
-  | DRAW NAME {popImage();}
+  | DRAW NAME {popImage();printDraw();}
   | NAME '(' ')' {}
   | var
+  | IMAGE NAME { pushImage($2); } '=' IMAGE '{' e '}' { }
+  | FUNCTION NAME{} '{' e '}' {}
   ;
 
 scalar : NAME { $$ = get_scalarValue( $1 ); }

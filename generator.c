@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "generator.h"
 #include <math.h>
+#include <string.h>
 
 #include "stack.h"
 
@@ -99,10 +100,20 @@ void printCPoint( double x, double y )
      if( !wasMoved ){
          setFirstPoint(x,y);
          if(currentPrintMode == PRINT_MODE_IMAGE){
-             if(currentPointMode == POINT_MODE_NONE)
-                 sprintf( topImage()->instructions, "\tcairo_move_to( cr, %0.2f, %0.2f );\n", x, y );
-             else if(currentPointMode == POINT_MODE_ADD)
-                 sprintf( topImage()->instructions, "\tcairo_rel_move_to( cr, %0.2f, %0.2f );\n", x, y );
+             if(currentPointMode == POINT_MODE_NONE){
+                 char *cc = topImage()->instructions;
+                 char *tmp = malloc(sizeof(char) * 1024);
+                 sprintf(tmp, "\tcairo_move_to( cr, %0.2f, %0.2f );\n" ,x,y);
+                 strcat(cc, tmp);
+                 //sprintf(cc, "\tcairo_move_to( cr, %0.2f, %0.2f );\n" ,x,y);
+             }
+             else if(currentPointMode == POINT_MODE_ADD){
+                 char *cc = topImage()->instructions;
+                 char *tmp = malloc(sizeof(char) * 1024);
+                 sprintf(tmp,  "\tcairo_rel_move_to( cr, %0.2f, %0.2f );\n" ,x,y);
+                 strcat(cc, tmp);
+                 //sprintf( topImage()->instructions, "\tcairo_rel_move_to( cr, %0.2f, %0.2f );\n", x, y );
+             }
          } else {
          if(currentPointMode == POINT_MODE_NONE)
              fprintf( pfile, "\tcairo_move_to( cr, %0.2f, %0.2f );\n", x, y );
@@ -112,10 +123,22 @@ void printCPoint( double x, double y )
 	  wasMoved++;
      } else {
          if(currentPrintMode == PRINT_MODE_IMAGE){
-             if(currentPointMode == POINT_MODE_NONE)
-                 sprintf( topImage()->instructions, "\tcairo_line_to( cr, %0.2f, %0.2f );\n", x, y );
-             else if(currentPointMode == POINT_MODE_ADD)
-                 sprintf( topImage()->instructions, "\tcairo_rel_line_to( cr, %0.2f, %0.2f );\n", x, y );
+             if(currentPointMode == POINT_MODE_NONE){
+                 char *cc = topImage()->instructions;
+                 char *tmp = malloc(sizeof(char) * 1024);
+                 sprintf(tmp, "\tcairo_line_to( cr, %0.2f, %0.2f );\n" ,x,y);
+                 strcat(cc, tmp);
+                 //sprintf( topImage()->instructions, "\tcairo_line_to( cr, %0.2f, %0.2f );\n", x, y );
+                 
+             }
+             else if(currentPointMode == POINT_MODE_ADD){
+                 //sprintf( topImage()->instructions, "\tcairo_rel_line_to( cr, %0.2f, %0.2f );\n", x, y );
+                 char *cc = topImage()->instructions;
+                 char *tmp = malloc(sizeof(char) * 1024);
+                 sprintf(tmp, "\tcairo_rel_line_to( cr, %0.2f, %0.2f );\n" ,x,y);
+                 strcat(cc, tmp);
+                 
+             }
          } else {
          if(currentPointMode == POINT_MODE_NONE)
              fprintf( pfile, "\tcairo_line_to( cr, %0.2f, %0.2f );\n", x, y );
@@ -202,7 +225,7 @@ variable variable_create(char *name, void *var, int type){
 
 image image_create(){
     image i = malloc(sizeof(struct image));
-    i->instructions = malloc(sizeof(char *));
+    i->instructions = malloc(sizeof(char *)*4096);
     i->variables = create_list();
     return i;
 }

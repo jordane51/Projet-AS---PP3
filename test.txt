@@ -1,2 +1,4 @@
 image i = image{draw (2,2)--(100,100)}
 draw i
+image imaaaage = image{draw (0,5)--(45,90)}
+draw imaaaage
