@@ -1,0 +1,27 @@
+BISON_FILE=draw.y
+LEX_FILE=draw.l
+INCLUDE_CAIRO= libcairo-2.dll zlib1.dll libpng14-14.dll
+INCLUDE_GENERATOR= generator.c generator.h
+LIBS_CAIRO=-lm
+OUTFILE=Draw
+CFLAGS=-D_GNU_SOURCE
+$(OUTFILE): draw.tab.o lex.yy.o
+	gcc  $(CFLAGS) $(INCLUDE_CAIRO) $(INCLUDE_GENERATOR) list.c $(LIBS_CAIRO) $^ -o $(OUTFILE)
+draw.tab.o: draw.tab.c
+	gcc -c $(INCLUDE_CAIRO) $(LIBS_CAIRO)  $< 
+lex.yy.o: lex.yy.c
+	gcc $< -c
+draw.tab.c: 
+	bison -d $(BISON_FILE)
+lex.yy.c:
+	flex $(LEX_FILE)
+lex:
+	flex $(LEX_FILE)
+bison:
+	bison -d $(BISON_FILE)
+
+.PHONY: clean exe
+clean:
+	del *.o draw.tab.c draw.tab.h lex.yy.c $(OUTFILE) *.pdf *~ *output
+exe:
+	gcc -o ex1.out $(INCLUDE_CAIRO) -IC:\Users\Alexis\Downloads\LIBS\cairo-1.10.2\cairo-1.10.2\src draw.gen.c

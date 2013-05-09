@@ -2,11 +2,14 @@
 #include <stdlib.h>
 #include "generator.h"
 #include <math.h>
+#include "list.h"
 
 struct point_t{
      double x;
      double y;
 };
+
+List l;
 
 int wasMoved = 0;
 
@@ -17,6 +20,7 @@ int openFile(){
      if(pfile == NULL){
 	  return 0;
      }
+     l = create_list();
      return 1;
 }
 
@@ -84,6 +88,32 @@ void printDouble(double d){
      fprintf(pfile,"%f",d); 
 }
 
+
+
+void printEnd()
+{
+  fprintf( pfile, "\tcairo_set_line_width( cr, 5.0);\n"	\
+	   "\tcairo_stroke(cr);\n" \
+	   "\tcairo_destroy(cr);\n" \
+	   "\tcairo_surface_destroy(pdf_surface);\n" \
+	   "\treturn 0;\n" \
+	   "}");
+  destroy( l );
+}
+
 void closeFile(){
      fclose(pfile);
+}
+
+
+void register_scalarVar( char* name, double value )
+{
+  double* v = malloc( sizeof( double ) );
+  *v = value;
+  add_scalar( l, name, v);
+}
+
+double get_scalarValue( char* name )
+{
+  return get_scalar( l, name );
 }
