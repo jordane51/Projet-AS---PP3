@@ -14,14 +14,16 @@ int currentPointMode = POINT_MODE_NONE;
 point firstPoint =  NULL;
 
 FILE *pfile = NULL;
+FILE *hfile = NULL;
 
 int openFile(){
-     pfile = fopen("draw.gen.c","w");
-     if(pfile == NULL){
-	  return 0;
-     }
-     l = create_list();
-     return 1;
+    pfile = fopen("draw.gen.c","w");
+    hfile = fopen("draw.gen.h","w");
+    if(pfile == NULL || hfile == NULL){
+        return 0;
+    }
+    l = create_list();
+    return 1;
 }
 
 void setFirstPoint( double x, double y){
