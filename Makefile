@@ -9,7 +9,7 @@ ifeq ($(UNAME), Darwin)
 	INCLUDE_CAIRO= -L/usr/X11/lib -L/opt/X11/include/cairo/
 endif
 
-INCLUDE_GENERATOR= generator.c generator.h
+INCLUDE_GENERATOR= generator.c generator.h list.c list.h stack_list.c stack.h
 LIBS_CAIRO=-lcairo -lm
 OUTFILE=Draw
 CFLAGS=-D_GNU_SOURCE
