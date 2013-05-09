@@ -1,2 +1,14 @@
 *~
 *.DS_STORE
+*.o
+*.out
+*.pdf
+lex.yy.c
+draw.tab.c
+draw.tab.h
+Makefile
+draw.gen.c
+
+draw.gen.c
+
+draw.gen.c

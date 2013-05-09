@@ -4,14 +4,14 @@
 #include <math.h>
 #include "list.h"
 
-struct point_t{
-     double x;
-     double y;
-};
+#define LINE_WIDTH 1.0
 
 List l;
 
 int wasMoved = 0;
+int currentDrawMode = DRAW_MODE_NONE;
+int currentPointMode = POINT_MODE_NONE;
+point firstPoint =  NULL;
 
 FILE *pfile = NULL;
 
@@ -22,6 +22,22 @@ int openFile(){
      }
      l = create_list();
      return 1;
+}
+
+void setFirstPoint( double x, double y){
+    if(!firstPoint){
+        firstPoint = malloc(sizeof(struct point));
+    }
+    firstPoint->x = x;
+    firstPoint->y = y;
+}
+
+void setPointMode( int mode ){
+    currentPointMode = mode;
+}
+
+void setDrawMode( int mode ){
+    currentDrawMode = mode;
 }
 
 void printInit(){
@@ -39,6 +55,10 @@ void printInit(){
        "\tcairo_surface_t *surface;\ncairo_t *cr;\n" \
        "\tcairo_surface_t *pdf_surface = cairo_pdf_surface_create(\"res.pdf\",50,50);\n" \
        "\tcr = cairo_create( pdf_surface );\n");*/
+}
+
+void printEnd(){
+    fprintf(pfile, "\tcairo_destroy( cr );\n\tcairo_surface_destroy( pdf_surface );\n\treturn 0;\n}");
 }
 
 void printFile(char *text){
@@ -59,11 +79,20 @@ void printLine( double n1, double n2 )
 void printCPoint( double x, double y )
 {
      if( !wasMoved ){
-	  fprintf( pfile, "\tcairo_move_to( cr, %0.2f, %0.2f );\n", x, y ); 
+         setFirstPoint(x,y);
+         if(currentPointMode == POINT_MODE_NONE)
+             fprintf( pfile, "\tcairo_move_to( cr, %0.2f, %0.2f );\n", x, y );
+         else if(currentPointMode == POINT_MODE_ADD)
+             fprintf( pfile, "\tcairo_rel_move_to( cr, %0.2f, %0.2f );\n", x, y );
 	  wasMoved++;
      } else {
-	  fprintf( pfile, "\tcairo_line_to( cr, %0.2f, %0.2f );\n", x, y );
+         if(currentPointMode == POINT_MODE_NONE)
+             fprintf( pfile, "\tcairo_line_to( cr, %0.2f, %0.2f );\n", x, y );
+         else if(currentPointMode == POINT_MODE_ADD)
+            fprintf( pfile, "\tcairo_rel_line_to( cr, %0.2f, %0.2f );\n", x, y );
      }
+    //reset currentPointMode for next point ! -TODO add a function to do this
+    currentPointMode = POINT_MODE_NONE;
 }
 
 void printPPoint( double angle, double rayon )
@@ -76,19 +105,31 @@ void printPPoint( double angle, double rayon )
      double x = rayon * cos( angle );
      double y = rayon * sin( angle );
      if( !wasMoved ){
-	  fprintf( pfile, "\tcairo_move_to( cr, %0.2f, %0.2f );\n", x, y ); 
+         setFirstPoint(x,y);
+         if(currentPointMode == POINT_MODE_NONE)
+             fprintf( pfile, "\tcairo_move_to( cr, %0.2f, %0.2f );\n", x, y );
+         else if(currentPointMode == POINT_MODE_ADD)
+             fprintf( pfile, "\tcairo_rel_move_to( cr, %0.2f, %0.2f );\n", x, y );
 	  wasMoved++;
      } else {
-	  fprintf( pfile, "\tcairo_line_to( cr, %0.2f, %0.2f );\n", x, y );
+         if(currentPointMode == POINT_MODE_NONE)
+             fprintf( pfile, "\tcairo_line_to( cr, %0.2f, %0.2f );\n", x, y );
+         else if(currentPointMode == POINT_MODE_ADD)
+             fprintf( pfile, "\tcairo_rel_line_to( cr, %0.2f, %0.2f );\n", x, y );
      }
 
+}
+
+void printCycle(){
+    if(currentPointMode == POINT_MODE_NONE)
+        fprintf( pfile, "\tcairo_line_to( cr, %0.2f, %0.2f );\n", firstPoint->x, firstPoint->y );
+    else if(currentPointMode == POINT_MODE_ADD)
+        fprintf( pfile, "\tcairo_rel_line_to( cr, %0.2f, %0.2f );\n", firstPoint->x, firstPoint->y );
 }
 
 void printDouble(double d){
      fprintf(pfile,"%f",d); 
 }
-
-
 
 void printEnd()
 {
@@ -99,6 +140,19 @@ void printEnd()
 	   "\treturn 0;\n" \
 	   "}");
   destroy( l );
+}
+void printDraw( void ){
+    if(currentDrawMode == 0){
+        // DO NOTHING
+    } else if(currentDrawMode == DRAW_MODE_STROKE){ // STROKE
+        fprintf( pfile,"\tcairo_set_line_width( cr , %f );\n\tcairo_stroke( cr );\n",LINE_WIDTH );
+    } else if(currentDrawMode == DRAW_MODE_FILL){ // FILL
+        fprintf( pfile,"\tcairo_set_source_rgb( cr, 0, 0, 0 );//black\n\tcairo_fill( cr );\n" );
+    }
+    // Reset was_moved for next command !
+    free(firstPoint);
+    firstPoint = NULL;
+    wasMoved = 0;
 }
 
 void closeFile(){

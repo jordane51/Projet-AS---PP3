@@ -15,6 +15,7 @@
  
 %token SEP
 %token SEP_PLUS
+%token CYCLE
 %token <dbl>NUMBER
 %token DRAW
 %token FILL
@@ -25,14 +26,18 @@
 %type <dbl>point
 %type <dbl>scalar
 %left '+'
+%left '*'
+%left '/'
+%left '-'
 %%
-
-e : DRAW i 
-  | FILL i
-  | var e
+  
+s : s e
+  |
   ;
 
-i : suite
+e : DRAW suite {setDrawMode(DRAW_MODE_STROKE); printDraw();}
+  | FILL suite {setDrawMode(DRAW_MODE_FILL); printDraw();}
+  | var
   ;
 
 scalar : NAME { $$ = get_scalarValue( $1 ); }
@@ -44,8 +49,9 @@ var : ID NAME '=' NUMBER {register_scalarVar( $2, $4 );}
        ;
 
 suite : suite SEP point
-      | suite SEP_PLUS point
+	  | suite SEP '+' {setPointMode(POINT_MODE_ADD);} point
       | point
+	  | suite SEP CYCLE {printCycle();}
       ;
 
 
@@ -73,7 +79,7 @@ int main(){
 	       printf( "Syntaxe correcte\n" );
 	  else
 	       printf( "Syntaxe incorrecte\n" );
-	  printEnd();
+      printEnd();
 	  closeFile();
      }
 }
