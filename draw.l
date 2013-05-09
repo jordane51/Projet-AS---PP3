@@ -23,6 +23,9 @@
 "/"           {return '/';}
 "-"           {return '-';}
 "=" 		  {return '=';}
+"image"       {return IMAGE;}
+"function"    {return FUNCTION;}
+"{"           {return '{';}
+"}"           {return '}';}
 [[:alnum:]]+  {sprintf(yylval.str, "%s", yytext);return NAME;}
-
 

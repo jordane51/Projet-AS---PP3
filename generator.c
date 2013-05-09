@@ -2,27 +2,31 @@
 #include <stdlib.h>
 #include "generator.h"
 #include <math.h>
-#include "list.h"
+
+#include "stack.h"
 
 #define LINE_WIDTH 1.0
 
 List l;
+stack s;
 
 int wasMoved = 0;
 int currentDrawMode = DRAW_MODE_NONE;
 int currentPointMode = POINT_MODE_NONE;
+int currentPrintMode = PRINT_MODE_NONE;
 point firstPoint =  NULL;
 
 FILE *pfile = NULL;
 FILE *hfile = NULL;
 
 int openFile(){
-    pfile = fopen("draw.gen.c","w");
     hfile = fopen("draw.gen.h","w");
+    pfile = fopen("draw.gen.c","w");
     if(pfile == NULL || hfile == NULL){
         return 0;
     }
     l = create_list();
+    s = stack_create();
     return 1;
 }
 
@@ -42,15 +46,22 @@ void setDrawMode( int mode ){
     currentDrawMode = mode;
 }
 
+void setPrintMode( int mode ){
+    currentPrintMode = mode;
+}
+
 void printInit(){
      fprintf(pfile, "#include <cairo.h>\n" \
 	     "#include <cairo-pdf.h>\n" \
-	     "\tint main( void ){\n" \
-	     "\tcairo_surface_t *surface;\n" \
-	     "\tcairo_t *cr;\n" \
-	     "\tcairo_surface_t *pdf_surface = cairo_pdf_surface_create(\"res.pdf\",50,50);\n" \
+        "#include \"draw.gen.h\"\n" \
+             "cairo_surface_t *surface;\n" \
+             "cairo_t *cr;\n" \
+             "cairo_surface_t *pdf_surface;\n" \
+	     "int main( void ){\n" \
+             "\tpdf_surface = cairo_pdf_surface_create(\"res.pdf\",50,50);\n" \
 	     "\tcr = cairo_create( pdf_surface );\n");
 
+    //fprintf(hfile, "#include \"draw.gen.c\"\n");
      /*printFile("#include <cairo.h>\n" \ 
        "#include <cairo-pdf.h>\n" \ 
        "\tint main( void ){\n" \
@@ -83,21 +94,38 @@ void printLine( double n1, double n2 )
 
 void printCPoint( double x, double y )
 {
+    //printf("X: %f,Y: %f\n",x,y);
+    //printf("Top: %s\n",topImage()->instructions);
      if( !wasMoved ){
          setFirstPoint(x,y);
+         if(currentPrintMode == PRINT_MODE_IMAGE){
+             if(currentPointMode == POINT_MODE_NONE)
+                 sprintf( topImage()->instructions, "\tcairo_move_to( cr, %0.2f, %0.2f );\n", x, y );
+             else if(currentPointMode == POINT_MODE_ADD)
+                 sprintf( topImage()->instructions, "\tcairo_rel_move_to( cr, %0.2f, %0.2f );\n", x, y );
+         } else {
          if(currentPointMode == POINT_MODE_NONE)
              fprintf( pfile, "\tcairo_move_to( cr, %0.2f, %0.2f );\n", x, y );
          else if(currentPointMode == POINT_MODE_ADD)
              fprintf( pfile, "\tcairo_rel_move_to( cr, %0.2f, %0.2f );\n", x, y );
+         }
 	  wasMoved++;
      } else {
+         if(currentPrintMode == PRINT_MODE_IMAGE){
+             if(currentPointMode == POINT_MODE_NONE)
+                 sprintf( topImage()->instructions, "\tcairo_line_to( cr, %0.2f, %0.2f );\n", x, y );
+             else if(currentPointMode == POINT_MODE_ADD)
+                 sprintf( topImage()->instructions, "\tcairo_rel_line_to( cr, %0.2f, %0.2f );\n", x, y );
+         } else {
          if(currentPointMode == POINT_MODE_NONE)
              fprintf( pfile, "\tcairo_line_to( cr, %0.2f, %0.2f );\n", x, y );
          else if(currentPointMode == POINT_MODE_ADD)
             fprintf( pfile, "\tcairo_rel_line_to( cr, %0.2f, %0.2f );\n", x, y );
+         }
      }
     //reset currentPointMode for next point ! -TODO add a function to do this
     currentPointMode = POINT_MODE_NONE;
+    //printf("Top: %s\n",topImage()->instructions);
 }
 
 void printPPoint( double angle, double rayon )
@@ -111,16 +139,30 @@ void printPPoint( double angle, double rayon )
      double y = rayon * sin( angle );
      if( !wasMoved ){
          setFirstPoint(x,y);
+         if(currentPrintMode == PRINT_MODE_IMAGE){
+             if(currentPointMode == POINT_MODE_NONE)
+                 sprintf(topImage()->instructions, "\tcairo_move_to( cr, %0.2f, %0.2f );\n", x, y );
+             else if(currentPointMode == POINT_MODE_ADD)
+                 sprintf(topImage()->instructions, "\tcairo_rel_move_to( cr, %0.2f, %0.2f );\n", x, y );
+         } else {
          if(currentPointMode == POINT_MODE_NONE)
              fprintf( pfile, "\tcairo_move_to( cr, %0.2f, %0.2f );\n", x, y );
          else if(currentPointMode == POINT_MODE_ADD)
              fprintf( pfile, "\tcairo_rel_move_to( cr, %0.2f, %0.2f );\n", x, y );
+         }
 	  wasMoved++;
      } else {
+         if(currentPrintMode == PRINT_MODE_IMAGE){
+             if(currentPointMode == POINT_MODE_NONE)
+                 sprintf( topImage()->instructions, "\tcairo_line_to( cr, %0.2f, %0.2f );\n", x, y );
+             else if(currentPointMode == POINT_MODE_ADD)
+                 sprintf( topImage()->instructions, "\tcairo_rel_line_to( cr, %0.2f, %0.2f );\n", x, y );
+         } else {
          if(currentPointMode == POINT_MODE_NONE)
              fprintf( pfile, "\tcairo_line_to( cr, %0.2f, %0.2f );\n", x, y );
          else if(currentPointMode == POINT_MODE_ADD)
              fprintf( pfile, "\tcairo_rel_line_to( cr, %0.2f, %0.2f );\n", x, y );
+         }
      }
 
 }
@@ -137,7 +179,7 @@ void printDouble(double d){
 }
 
 void printDraw( void ){
-    if(currentDrawMode == 0){
+    if(currentDrawMode == DRAW_MODE_NONE){
         // DO NOTHING
     } else if(currentDrawMode == DRAW_MODE_STROKE){ // STROKE
         fprintf( pfile,"\tcairo_set_line_width( cr , %f );\n\tcairo_stroke( cr );\n",LINE_WIDTH );
@@ -148,6 +190,58 @@ void printDraw( void ){
     free(firstPoint);
     firstPoint = NULL;
     wasMoved = 0;
+}
+
+variable variable_create(char *name, void *var, int type){
+    variable va = malloc(sizeof(struct variable));
+    va->name = name;
+    va->var = var;
+    va->type = type;
+    return va;
+}
+
+image image_create(){
+    image i = malloc(sizeof(struct image));
+    i->instructions = malloc(sizeof(char *));
+    i->variables = create_list();
+    return i;
+}
+
+image topImage(){
+    variable v = (variable)stack_top(s);
+    image i = (image)v->var;
+    return i;
+}
+
+void pushImage( char* name ){
+    setPrintMode(PRINT_MODE_IMAGE);
+    image i = image_create();
+    variable v = variable_create(name,i, VAR_TYPE_IMAGE);
+    stack_push(s, v);
+}
+
+void popImage(){
+    fprintf(pfile, topImage()->instructions);
+    stack_pop(s);
+    setPrintMode(PRINT_MODE_NONE);
+}
+
+void swapBuffers( void ){
+    void* tmp = pfile;
+    pfile = hfile;
+    hfile = tmp;
+}
+
+void printFunctionStart( char* name ){
+    fprintf( hfile, "void %s( void ){\n",name);
+}
+
+void printFunctionEnd( void ){
+    fprintf( hfile, "}\n");
+}
+
+void printFunctionCall( char* name ){
+    fprintf( pfile, "\t%s();\n",name );
 }
 
 void closeFile(){

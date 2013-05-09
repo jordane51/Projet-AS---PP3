@@ -17,6 +17,8 @@
 %token SEP
 %token SEP_PLUS
 %token CYCLE
+%token IMAGE
+%token FUNCTION
 %token <dbl>NUMBER
 %token DRAW
 %token FILL
@@ -34,11 +36,16 @@
 %%
   
 s : s e
+  | s IMAGE NAME { pushImage($3); } '=' IMAGE '{' e '}' { }
+  | s FUNCTION NAME{} '{' e '}' {}
   |
   ;
 
 e : DRAW suite {setDrawMode(DRAW_MODE_STROKE); printDraw();}
+  | DRAW IMAGE '{' e '}' {}
   | FILL suite {setDrawMode(DRAW_MODE_FILL); printDraw();}
+  | DRAW NAME {popImage();}
+  | NAME '(' ')' {}
   | var
   ;
 
