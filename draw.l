@@ -29,4 +29,5 @@
 "{"           {return '{';}
 "}"           {return '}';}
 [[:alnum:]]+  {sprintf(yylval.str, "%s", yytext);return NAME;}
-
+"rotate"      {return ROTATE;}
+"translate"   {return TRANSLATE;}

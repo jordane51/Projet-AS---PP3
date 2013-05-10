@@ -18,6 +18,8 @@
 %token SEP_PLUS
 %token CYCLE
 %token IMAGE
+%token TRANSLATE
+%token ROTATE
 %token FUNCTION
 %token <dbl>NUMBER
 %token DRAW
@@ -46,6 +48,9 @@ e : DRAW suite {setDrawMode(DRAW_MODE_STROKE); printDraw();}
   | var
   | IMAGE NAME { pushImage($2); } '=' IMAGE '{' e '}' { }
   | FUNCTION NAME{} '{' e '}' {}
+  | ROTATE {setTransformMode(TRANSFORM_MODE_ROTATE);} NUMBER {settAngle($3);} suite
+  | TRANSLATE {setTransformMode(TRANSFORM_MODE_ROTATE);} NUMBER NUMBER {setTx($3); setTy($4);} suite
+  ;
 
 
 

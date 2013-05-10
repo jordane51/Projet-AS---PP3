@@ -15,13 +15,17 @@ int wasMoved = 0;
 int currentDrawMode = DRAW_MODE_NONE;
 int currentPointMode = POINT_MODE_NONE;
 int currentPrintMode = PRINT_MODE_NONE;
+int currentTransformMode = TRANSFORM_MODE_NONE;
+double tAngle = 0.0;
+double tTranslatex = 0.0;
+double tTranslatey = 0.0;
 point firstPoint =  NULL;
 
 FILE *pfile = NULL;
 FILE *hfile = NULL;
 
 int openFile(){
-    hfile = fopen("draw.gen.h","w");
+    hfile = fopen("draw.funcs.c","w");
     pfile = fopen("draw.gen.c","w");
     if(pfile == NULL || hfile == NULL){
         return 0;
@@ -29,6 +33,18 @@ int openFile(){
     l = create_list();
     s = stack_create();
     return 1;
+}
+
+void settAngle( double a ){
+    tAngle = a;
+}
+
+void setTx( double tx ){
+    tTranslatex = tx;
+}
+
+void setTy( double ty ){
+    tTranslatey = ty;
 }
 
 void setFirstPoint( double x, double y){
@@ -43,6 +59,10 @@ void setPointMode( int mode ){
     currentPointMode = mode;
 }
 
+void setTransformMode( int mode ){
+    currentTransformMode = mode;
+}
+
 void setDrawMode( int mode ){
     currentDrawMode = mode;
 }
@@ -54,7 +74,7 @@ void setPrintMode( int mode ){
 void printInit(){
      fprintf(pfile, "#include <cairo.h>\n" \
 	     "#include <cairo-pdf.h>\n" \
-        "#include \"draw.gen.h\"\n" \
+        "#include \"draw.funcs.c\"\n" \
              "cairo_surface_t *surface;\n" \
              "cairo_t *cr;\n" \
              "cairo_surface_t *pdf_surface;\n" \
@@ -95,11 +115,18 @@ void printLine( double n1, double n2 )
 
 void printCPoint( double x, double y )
 {
-    //printf("X: %f,Y: %f\n",x,y);
-    //printf("Top: %s\n",topImage()->instructions);
+    // Si on est en mode transformation, on imprime la transformation nécessaire
+    if(currentTransformMode == TRANSFORM_MODE_TRANSLATE)
+        printTranslate(tTranslatex, tTranslatey);
+    if(currentTransformMode == TRANSFORM_MODE_ROTATE)
+        printRotate(tAngle);
+    // Tout d'abord, si le point est le premier, on doit générer move_to plutot que line_to
      if( !wasMoved ){
+         // C'est le premier point, on le stocke donc pour cycle
          setFirstPoint(x,y);
+         // Si on est en mode image, il va falloir ajouter l'instruction aux instructions de l'image en haut de la pile
          if(currentPrintMode == PRINT_MODE_IMAGE){
+             // Si on est en mode coordonnées absolues, on appelle cairo_move_to
              if(currentPointMode == POINT_MODE_NONE){
                  char *cc = topImage()->instructions;
                  char *tmp = malloc(sizeof(char) * 1024);
@@ -107,6 +134,7 @@ void printCPoint( double x, double y )
                  strcat(cc, tmp);
                  //sprintf(cc, "\tcairo_move_to( cr, %0.2f, %0.2f );\n" ,x,y);
              }
+             // Sinon, en mode coordonnées absolues, cairo_rel_move_to
              else if(currentPointMode == POINT_MODE_ADD){
                  char *cc = topImage()->instructions;
                  char *tmp = malloc(sizeof(char) * 1024);
@@ -114,14 +142,14 @@ void printCPoint( double x, double y )
                  strcat(cc, tmp);
                  //sprintf( topImage()->instructions, "\tcairo_rel_move_to( cr, %0.2f, %0.2f );\n", x, y );
              }
-         } else {
+         } else { // Si ce n'est pas le mode image, on fait pareil mais en écrivant dans le fichier
          if(currentPointMode == POINT_MODE_NONE)
              fprintf( pfile, "\tcairo_move_to( cr, %0.2f, %0.2f );\n", x, y );
          else if(currentPointMode == POINT_MODE_ADD)
              fprintf( pfile, "\tcairo_rel_move_to( cr, %0.2f, %0.2f );\n", x, y );
          }
 	  wasMoved++;
-     } else {
+     } else { // Si ce n'est pas le premier point, meme principe mais avec line_to
          if(currentPrintMode == PRINT_MODE_IMAGE){
              if(currentPointMode == POINT_MODE_NONE){
                  char *cc = topImage()->instructions;
@@ -160,6 +188,13 @@ void printPPoint( double angle, double rayon )
 
      double x = rayon * cos( angle );
      double y = rayon * sin( angle );
+    
+    if(currentTransformMode == TRANSFORM_MODE_TRANSLATE)
+        printTranslate(tTranslatex, tTranslatey);
+    if(currentTransformMode == TRANSFORM_MODE_ROTATE)
+        printRotate(tAngle);
+    
+    // Meme principe que printCPoint
      if( !wasMoved ){
          setFirstPoint(x,y);
          if(currentPrintMode == PRINT_MODE_IMAGE){
@@ -191,10 +226,19 @@ void printPPoint( double angle, double rayon )
 }
 
 void printCycle(){
+    // Récupère la valeur du premier point de l'imprime
     if(currentPointMode == POINT_MODE_NONE)
         fprintf( pfile, "\tcairo_line_to( cr, %0.2f, %0.2f );\n", firstPoint->x, firstPoint->y );
     else if(currentPointMode == POINT_MODE_ADD)
         fprintf( pfile, "\tcairo_rel_line_to( cr, %0.2f, %0.2f );\n", firstPoint->x, firstPoint->y );
+}
+
+void printTranslate(double ix, double iy){
+    fprintf( pfile, "\tcairo_translate( cr, %0.2f, %0.2f );\n", ix, iy );
+}
+
+void printRotate(double angle){
+    fprintf( pfile, "\tcairo_rotate( cr, %f );\n", angle );
 }
 
 void printDouble(double d){
@@ -202,6 +246,7 @@ void printDouble(double d){
 }
 
 void printDraw( void ){
+    // En fonction du mode de dessin courant, imprime les appels nécessaires
     if(currentDrawMode == DRAW_MODE_NONE){
         // DO NOTHING
     } else if(currentDrawMode == DRAW_MODE_STROKE){ // STROKE
@@ -237,6 +282,7 @@ image topImage(){
 }
 
 void pushImage( char* name ){
+    // Empile une image
     setPrintMode(PRINT_MODE_IMAGE);
     image i = image_create();
     variable v = variable_create(name,i, VAR_TYPE_IMAGE);
@@ -244,12 +290,14 @@ void pushImage( char* name ){
 }
 
 void popImage(){
+    // Pop image
     fprintf(pfile, topImage()->instructions);
     stack_pop(s);
     setPrintMode(PRINT_MODE_NONE);
 }
 
 void swapBuffers( void ){
+    // Fonction utilitaire
     void* tmp = pfile;
     pfile = hfile;
     hfile = tmp;

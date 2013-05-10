@@ -13,7 +13,10 @@ enum{
     VAR_TYPE_IMAGE,
     VAR_TYPE_SCALAR,
     VAR_TYPE_POINT,
-    VAR_TYPE_PATH
+    VAR_TYPE_PATH,
+    TRANSFORM_MODE_NONE,
+    TRANSFORM_MODE_ROTATE,
+    TRANSFORM_MODE_TRANSLATE
 };
 
 struct variable{
@@ -52,6 +55,14 @@ void setDrawMode( int );
 // Sets the current point type
 void setPointMode( int );
 
+void setTransformMode( int );
+
+void settAngle( double );
+
+void setTx( double );
+
+void setTy( double );
+
 // Prints the necessary code to initialize the surface
 void printInit();
 // Prints the code usef to close the surface and return 0 if there was no error
@@ -66,6 +77,8 @@ void printCPoint( double, double );
 void printMove( double, double );
 void printLine( double, double );
 void printDraw( void );
+void printTranslate(double, double);
+void printRotate(double);
 
 //Images
 void pushImage( char* );
